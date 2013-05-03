@@ -50,24 +50,31 @@ subtreeMerge base name = do
   where
     repo = base ++ "/" ++ name ++ ".git"
 
+initRepo :: String -> IO ExitCode
+initRepo dir = do
+  createDirectoryIfMissing False dir
+  cd dir
+  init
+  setupRepo
+
 setupRepo :: IO ExitCode
 setupRepo = do
   rawSystem "touch" [".gitignore"]
   git ["add", ".gitignore"]
   commit "initial commit"
 
+initSubtrees base repos = do
+  branch "upstream-subtrees"
+  checkout "upstream-subtrees"
+  mapM (subtreeMerge base) repos
+
 main :: IO ExitCode
 main = let
   base = "https://github.com/oconnor0"
-  repos = ["subtree-merges", "clever-algorithms", "resume", "learn-coq", "zero", "scheme-in-haskell"]
+  repos = ["subtree-merges", "resume"] --, "learn-coq", "zero", "scheme-in-haskell"]
   in do
-    temp <- getTemporaryDirectory
-    let dest = temp ++ "/test"
-    createDirectoryIfMissing False dest
-    cd dest
-    init
-    setupRepo
-    branch "upstream-subtrees"
-    checkout "upstream-subtrees"
-    mapM (subtreeMerge base) repos
+    tmp <- getTemporaryDirectory
+    let dir = tmp ++ "/test4"
+    initRepo dir
+    initSubtrees base repos
     >>= exitWith . maximum
