@@ -11,13 +11,6 @@ import System.Exit
 maybeThrow e@(ExitFailure _) = throwIO e
 maybeThrow ExitSuccess = return ExitSuccess
 
-externalFail :: IO ExitCode
-externalFail = do
-  --dir <- getHomeDirectory
-  dir <- getCurrentDirectory
-  rawSystem "runhaskell" [dir ++ "/fail.hs"]
-  >>= maybeThrow
-
 cd :: FilePath -> IO ()
 cd dir = setCurrentDirectory dir
 
@@ -65,8 +58,8 @@ setupRepo = do
 
 main :: IO ExitCode
 main = let
-  base = "https://stash.issinc.com/stash/scm/we"
-  repos = ["audit-auditor", "audit-commons", "audit-consumer", "audit-data-service", "audit-filter", "audit-reader", "audit-writer", "esb-auditxml"]
+  base = "https://github.com/oconnor0"
+  repos = ["subtree-merges", "clever-algorithms", "resume", "learn-coq", "zero", "scheme-in-haskell"]
   in do
     temp <- getTemporaryDirectory
     let dest = temp ++ "/test"

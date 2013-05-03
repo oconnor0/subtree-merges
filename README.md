@@ -1,4 +1,4 @@
 subtree-merges
 ==============
 
-Provides tools for managing multiple subtree merges in Git
+Provides tools for managing multiple subtree merges in Git.
