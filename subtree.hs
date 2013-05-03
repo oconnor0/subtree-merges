@@ -79,8 +79,48 @@ pullSubtrees :: [String] -> IO [ExitCode]
 pullSubtrees repos = do
   mapM pullSubtree repos
 
-main :: IO ExitCode
-main = let
+data Options = Options
+  { optCommand :: Command }
+
+data Command
+  = PullSubtrees
+
+{- data Sample = Sample
+  { hello :: String
+  , quiet :: Bool }
+
+sample :: Parser Sample
+sample = Sample
+     <$> strOption
+         ( long "hello"
+        <> metavar "TARGET"
+        <> help "Target for the greeting" )
+     <*> switch
+         ( long "quiet"
+        <> help "Whether to be quiet" )
+-}
+
+options :: Parser Options
+options = Options
+  <$> command
+
+commands = subparser
+  ( command "pull" (info pullOptions
+    (progDesc "Pull all subtrees from origins"))
+  )
+
+pullOptions = nullOption
+
+main = execParser opts
+  where
+    opts = info (helper <*> options)
+      ( fullDesc
+     <> progDesc "Git Subtree Merges"
+     <> header "subtrees - ")
+
+
+test_main :: IO ExitCode
+test_main = let
   base = "https://github.com/oconnor0"
   repos = ["subtree-merges", "resume"] --, "learn-coq", "zero", "scheme-in-haskell"]
   --in do
