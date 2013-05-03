@@ -13,8 +13,9 @@ maybeThrow ExitSuccess = return ExitSuccess
 
 externalFail :: IO ExitCode
 externalFail = do
-  homeDir <- getHomeDirectory
-  rawSystem "runhaskell" [homeDir ++ "/Dropbox/Documents/SubtreeMerges/fail.hs"]
+  --dir <- getHomeDirectory
+  dir <- getCurrentDirectory
+  rawSystem "runhaskell" [dir ++ "/fail.hs"]
   >>= maybeThrow
 
 cd :: FilePath -> IO ()
