@@ -81,9 +81,11 @@ pullSubtrees repos = do
 
 data Options = Options
   { optCommand :: Command }
+  deriving Show
 
 data Command
   = PullSubtrees
+  deriving Show
 
 {- data Sample = Sample
   { hello :: String
@@ -102,8 +104,9 @@ sample = Sample
 
 options :: Parser Options
 options = Options
-  <$> command
+  <$> commands
 
+commands :: Parser Command
 commands = subparser
   ( command "pull" (info pullOptions
     (progDesc "Pull all subtrees from origins"))
@@ -116,7 +119,7 @@ main = execParser opts
     opts = info (helper <*> options)
       ( fullDesc
      <> progDesc "Git Subtree Merges"
-     <> header "subtrees - ")
+     <> header "subtrees - provides support for managing multiple subtrees in Git repos")
 
 
 test_main :: IO ExitCode
