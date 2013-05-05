@@ -106,6 +106,8 @@ run (Options PullSubtrees) = putStrLn "pull subtrees"
 
 main :: IO ()
 main = execParser opts >>= run
+  -- >> test_main
+  >> return ()
   where
     opts = info (helper <*> options)
       ( fullDesc
@@ -115,15 +117,15 @@ test_main :: IO ExitCode
 test_main = let
   base = "https://github.com/oconnor0"
   repos = ["subtree-merges", "resume"] --, "learn-coq", "zero", "scheme-in-haskell"]
-  --in do
-  --  tmp <- getTemporaryDirectory
-  --  let dir = tmp ++ "/test4"
-  --  initRepo dir
-  --  initSubtrees base repos
-  --  >>= exitWith . maximum
   in do
     tmp <- getTemporaryDirectory
-    let dir = tmp ++ "/test3"
-    cd dir
-    pullSubtrees repos
+    let dir = "/src/subtree-merges" ++ "/test"
+    initRepo dir
+    initSubtrees base repos
     >>= exitWith . maximum
+  --in do
+  --  tmp <- getTemporaryDirectory
+  --  let dir = tmp ++ "/test3"
+  --  cd dir
+  --  pullSubtrees repos
+  --  >>= exitWith . maximum
