@@ -108,14 +108,19 @@ options = Options
 
 commands :: Parser Command
 commands = subparser
-  ( command "pull" (info pullOptions
+  ( command "pull" (info (pure PullSubtrees) --pullOptions
     (progDesc "Pull all subtrees from origins"))
   )
 
 pullOptions :: Parser Command
 pullOptions = nullOption (help "help info")
 
-main = execParser opts
+run (Options PullSubtrees) = putStrLn "pull subtrees"
+--run opts = case optCommand opts of
+  -- | PullSubtrees -> putStrLn "pull subtrees"
+
+main :: IO ()
+main = execParser opts >>= run
   where
     opts = info (helper <*> options)
       ( fullDesc
