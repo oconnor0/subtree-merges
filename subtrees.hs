@@ -87,21 +87,6 @@ data Options = Options
   { optCommand :: Command }
   deriving Show
 
-{- data Sample = Sample
-  { hello :: String
-  , quiet :: Bool }
-
-sample :: Parser Sample
-sample = Sample
-     <$> strOption
-         ( long "hello"
-        <> metavar "TARGET"
-        <> help "Target for the greeting" )
-     <*> switch
-         ( long "quiet"
-        <> help "Whether to be quiet" )
--}
-
 options :: Parser Options
 options = Options
   <$> commands
@@ -115,9 +100,8 @@ commands = subparser
 pullOptions :: Parser Command
 pullOptions = nullOption (help "help info")
 
+run :: Options -> IO ()
 run (Options PullSubtrees) = putStrLn "pull subtrees"
---run opts = case optCommand opts of
-  -- | PullSubtrees -> putStrLn "pull subtrees"
 
 main :: IO ()
 main = execParser opts >>= run
