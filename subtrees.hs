@@ -4,6 +4,8 @@ import Control.Monad
 import Control.Exception
 import Options.Applicative
 
+import Data.List (intercalate)
+
 import System.Cmd (rawSystem)
 import System.Directory
 import System.Exit
@@ -81,7 +83,7 @@ pullSubtrees repos = do
   mapM pullSubtree repos
 
 data Command
-  = PullSubtrees
+  = PullSubtrees [String]
   deriving Show
 
 data Options = Options
@@ -89,20 +91,20 @@ data Options = Options
   deriving Show
 
 options :: Parser Options
-options = Options
-  <$> commands
+options = Options <$> commands
 
 commands :: Parser Command
 commands = subparser
-  ( command "pull" (info (pure PullSubtrees) --pullOptions
+  ( command "pull" (info pullOptions
     (progDesc "Pull all subtrees from origins"))
   )
 
 pullOptions :: Parser Command
-pullOptions = nullOption (help "help info")
+pullOptions =  PullSubtrees <$> arguments str (metavar "SUBTREE...")
 
 run :: Options -> IO ()
-run (Options PullSubtrees) = putStrLn "pull subtrees"
+run (Options (PullSubtrees [])) = putStrLn "pull all subtrees"
+run (Options (PullSubtrees xs)) = putStrLn $ "pull " ++ intercalate ", " xs ++ " subtrees"
 
 main :: IO ()
 main = execParser opts >>= run
