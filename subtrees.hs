@@ -79,12 +79,12 @@ pullSubtrees :: [String] -> IO [ExitCode]
 pullSubtrees repos = do
   mapM pullSubtree repos
 
-data Options = Options
-  { optCommand :: Command }
-  deriving Show
-
 data Command
   = PullSubtrees
+  deriving Show
+
+data Options = Options
+  { optCommand :: Command }
   deriving Show
 
 {- data Sample = Sample
@@ -112,7 +112,8 @@ commands = subparser
     (progDesc "Pull all subtrees from origins"))
   )
 
-pullOptions = nullOption
+pullOptions :: Parser Command
+pullOptions = nullOption (help "help info")
 
 main = execParser opts
   where
