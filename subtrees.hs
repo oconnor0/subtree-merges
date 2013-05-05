@@ -8,6 +8,7 @@ import System.Cmd (rawSystem)
 import System.Directory
 import System.Exit
 
+maybeThrow :: ExitCode -> IO ExitCode
 maybeThrow e@(ExitFailure _) = throwIO e
 maybeThrow ExitSuccess = return ExitSuccess
 
@@ -108,9 +109,7 @@ main = execParser opts >>= run
   where
     opts = info (helper <*> options)
       ( fullDesc
-     <> progDesc "Git Subtree Merges"
      <> header "subtrees - provides support for managing multiple subtrees in Git repos")
-
 
 test_main :: IO ExitCode
 test_main = let
