@@ -105,7 +105,7 @@ pullOptions =  PullSubtrees
 addOptions :: Parser Command
 addOptions = AddSubtrees
   <$> argument str (metavar "BASE")
-  <*> arguments1 str (metavar "REPO...")
+  <*> arguments1 str (metavar "NAME...")
 
 run :: Options -> IO ExitCode
 run (Options (PullSubtrees [])) = putStrLn "pull all subtrees not yet implemented" >> (return $ ExitFailure 11)
@@ -117,12 +117,12 @@ runSetup :: IO ExitCode
 runSetup = setupRepo
 
 runAddSubtrees :: String -> [String] -> IO ExitCode
-runAddSubtrees base repos =
-  checkout "upstream-subtrees" >> addSubtrees base repos >>= return . maximum
+runAddSubtrees base names =
+  checkout "upstream-subtrees" >> addSubtrees base names >>= return . maximum
 
 runPullSubtrees :: [String] -> IO ExitCode
-runPullSubtrees repos =
-  checkout "upstream-subtrees" >> pullSubtrees repos >>= return . maximum
+runPullSubtrees names =
+  checkout "upstream-subtrees" >> pullSubtrees names >>= return . maximum
 
 main :: IO ()
 main = execParser opts >>= run
