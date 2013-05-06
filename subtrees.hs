@@ -103,10 +103,13 @@ commands = subparser
   )
 
 pullOptions :: Parser Command
-pullOptions =  PullSubtrees <$> arguments str (metavar "SUBTREE...")
+pullOptions =  PullSubtrees
+  <$> arguments str (metavar "SUBTREE...")
 
 addOptions :: Parser Command
-addOptions = AddSubtrees <$> argument str (metavar "BASE") <*> arguments1 str (metavar "REPO...")
+addOptions = AddSubtrees
+  <$> argument str (metavar "BASE")
+  <*> arguments1 str (metavar "REPO...")
 
 run :: Options -> IO ExitCode
 run (Options (PullSubtrees [])) = putStrLn "pull all subtrees not yet implemented" >> (return $ ExitFailure 11)
