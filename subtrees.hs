@@ -39,7 +39,8 @@ mergeNoCommit :: String -> IO ExitCode
 mergeNoCommit name = git "merge" ["-s", "ours", "--no-commit", name ++ "/master"]
 
 readTreeUpdate :: String -> IO ExitCode
-readTreeUpdate name = git "read-tree" ["--prefix=" ++ name ++ "/", "-u", name ++ "/master"]
+readTreeUpdate name = git "read-tree"
+  ["--prefix=" ++ name ++ "/", "-u", name ++ "/master"]
 
 fromName :: String -> String -> String
 fromName base name = base ++ "/" ++ name ++ ".git"
@@ -108,7 +109,8 @@ addOptions = AddSubtrees
   <*> arguments1 str (metavar "NAME...")
 
 run :: Options -> IO ExitCode
-run (Options (PullSubtrees [])) = putStrLn "pull all subtrees not yet implemented" >> (return $ ExitFailure 11)
+run (Options (PullSubtrees [])) = putStrLn "pull all subtrees not yet implemented"
+  >> (return $ ExitFailure 11)
 run (Options (PullSubtrees repos)) = runPullSubtrees repos
 run (Options (AddSubtrees base repos)) = runAddSubtrees base repos
 run (Options SetupForSubtrees) = runSetup
