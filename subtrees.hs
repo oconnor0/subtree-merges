@@ -82,9 +82,10 @@ data Command
   | AddSubtrees String [String]
   deriving Show
 
-data Options = Options
-  { optCommand :: Command }
-  deriving Show
+data Options
+  = Options {
+    optCommand :: Command
+  } deriving Show
 
 options :: Parser Options
 options = Options <$> commands
