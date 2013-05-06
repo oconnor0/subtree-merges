@@ -61,7 +61,6 @@ setupRepo = do
 
 addSubtrees :: String -> [String] -> IO [ExitCode]
 addSubtrees base repos = do
-  checkout "upstream-subtrees"
   mapM (subtreeMerge base) repos
 
 pull :: [String] -> IO ExitCode
@@ -113,14 +112,16 @@ run (Options (PullSubtrees repos)) = runPullSubtrees repos
 run (Options (AddSubtrees base repos)) = runAddSubtrees base repos
 run (Options SetupForSubtrees) = runSetup
 
-runPullSubtrees :: [String] -> IO ExitCode
-runPullSubtrees repos = pullSubtrees repos >>= return . maximum
-
-runAddSubtrees :: String -> [String] -> IO ExitCode
-runAddSubtrees base repos = addSubtrees base repos >>= return . maximum
-
 runSetup :: IO ExitCode
 runSetup = setupRepo
+
+runAddSubtrees :: String -> [String] -> IO ExitCode
+runAddSubtrees base repos =
+  checkout "upstream-subtrees" >> addSubtrees base repos >>= return . maximum
+
+runPullSubtrees :: [String] -> IO ExitCode
+runPullSubtrees repos =
+  checkout "upstream-subtrees" >> pullSubtrees repos >>= return . maximum
 
 main :: IO ()
 main = execParser opts >>= run
