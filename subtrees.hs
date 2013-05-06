@@ -65,8 +65,8 @@ setupRepo = do
   git "add" [".gitignore"]
   commit "initial commit"
 
-initSubtrees :: String -> [String] -> IO [ExitCode]
-initSubtrees base repos = do
+addSubtrees :: String -> [String] -> IO [ExitCode]
+addSubtrees base repos = do
   branch "upstream-subtrees"
   checkout "upstream-subtrees"
   mapM (subtreeMerge base) repos
@@ -84,6 +84,7 @@ pullSubtrees repos = do
 
 data Command
   = PullSubtrees [String]
+  | AddSubtrees String [String]
   deriving Show
 
 data Options = Options
@@ -97,14 +98,26 @@ commands :: Parser Command
 commands = subparser
   ( command "pull" (info pullOptions
     (progDesc "Pull all subtrees from origins"))
+ <> command "add" (info addOptions
+    (progDesc "Add subtrees to remotes and merge them as subdirectories"))
   )
 
 pullOptions :: Parser Command
 pullOptions =  PullSubtrees <$> arguments str (metavar "SUBTREE...")
 
-run :: Options -> IO ()
-run (Options (PullSubtrees [])) = putStrLn "pull all subtrees"
-run (Options (PullSubtrees xs)) = putStrLn $ "pull " ++ intercalate ", " xs ++ " subtrees"
+addOptions :: Parser Command
+addOptions = AddSubtrees <$> argument str (metavar "BASE") <*> arguments1 str (metavar "REPO...")
+
+run :: Options -> IO ExitCode
+run (Options (PullSubtrees [])) = putStrLn "pull all subtrees not yet implemented" >> (return $ ExitFailure 11)
+run (Options (PullSubtrees repos)) = runPullSubtrees repos
+run (Options (AddSubtrees base repos)) = runAddSubtrees base repos
+
+runPullSubtrees :: [String] -> IO ExitCode
+runPullSubtrees repos = pullSubtrees repos >>= return . maximum
+
+runAddSubtrees :: String -> [String] -> IO ExitCode
+runAddSubtrees base repos = addSubtrees base repos >>= return . maximum
 
 main :: IO ()
 main = execParser opts >>= run
@@ -123,7 +136,7 @@ test_main = let
     tmp <- getTemporaryDirectory
     let dir = "/src/subtree-merges" ++ "/test"
     initRepo dir
-    initSubtrees base repos
+    addSubtrees base repos
     >>= exitWith . maximum
   --in do
   --  tmp <- getTemporaryDirectory
