@@ -53,12 +53,18 @@ subtreeMerge base name = do
   commit $ "Subtree merged in " ++ name
   where repo = base ++ "/" ++ name ++ ".git"
 
+initRepo :: FilePath -> IO ExitCode
+initRepo dir = do
+  createDirectoryIfMissing False dir
+  cd dir
+  init
+  rawSystem "touch" [".gitignore"]
+  git "add" [".gitignore"]
+  commit "initial commit"
+  setupRepo
+
 setupRepo :: IO ExitCode
 setupRepo = do
-  -- TODO: this should actually properly setup the repo
-  --rawSystem "touch" [".gitignore"]
-  --git "add" [".gitignore"]
-  --commit "initial commit"
   branch "upstream-subtrees"
 
 addSubtrees :: String -> [String] -> IO [ExitCode]
@@ -77,7 +83,8 @@ pullSubtrees repos = do
   mapM pullSubtree repos
 
 data Command
-  = SetupForSubtrees
+  = InitRepository FilePath
+  | SetupForSubtrees
   | PullSubtrees [String]
   | AddSubtrees String [String]
   deriving Show
@@ -92,13 +99,22 @@ options = Options <$> commands
 
 commands :: Parser Command
 commands = subparser
-  ( command "setup" (info (pure SetupForSubtrees)
-    (progDesc "Set up repo for subtree merges"))
+  ( command "init" (info initOptions
+    (progDesc "Init a repo in the provided directory and set up for subtrees"))
+ <> command "setup" (info (pure SetupForSubtrees)
+    (progDesc "Set up existing repo for subtree merges"))
  <> command "add" (info addOptions
     (progDesc "Add subtrees to remotes and merge them as subdirectories"))
  <> command "pull" (info pullOptions
     (progDesc "Pull all subtrees from origins"))
   )
+
+initOptions :: Parser Command
+initOptions = InitRepository
+  <$> argument str (
+      metavar "DIR"
+   <> value "."
+   <> help "Directory to create repository in; defaults to current directory")
 
 pullOptions :: Parser Command
 pullOptions =  PullSubtrees
@@ -110,11 +126,15 @@ addOptions = AddSubtrees
   <*> arguments1 str (metavar "NAME...")
 
 run :: Options -> IO ExitCode
+run (Options (InitRepository dir)) = runInit dir
+run (Options SetupForSubtrees) = runSetup
 run (Options (PullSubtrees [])) = putStrLn "pull all subtrees not yet implemented"
   >> (return $ ExitFailure 1)
 run (Options (PullSubtrees repos)) = runPullSubtrees repos
 run (Options (AddSubtrees base repos)) = runAddSubtrees base repos
-run (Options SetupForSubtrees) = runSetup
+
+runInit :: FilePath -> IO ExitCode
+runInit dir = initRepo dir
 
 runSetup :: IO ExitCode
 runSetup = setupRepo
