@@ -110,7 +110,7 @@ addOptions = AddSubtrees
 
 run :: Options -> IO ExitCode
 run (Options (PullSubtrees [])) = putStrLn "pull all subtrees not yet implemented"
-  >> (return $ ExitFailure 11)
+  >> (return $ ExitFailure 1)
 run (Options (PullSubtrees repos)) = runPullSubtrees repos
 run (Options (AddSubtrees base repos)) = runAddSubtrees base repos
 run (Options SetupForSubtrees) = runSetup
@@ -133,7 +133,7 @@ main = execParser opts >>= run
   where
     opts = info (helper <*> options)
       ( fullDesc
-     <> header "subtrees - provides support for managing multiple subtrees in Git repos")
+     <> header "subtrees - tools to manage multiple subtrees in Git repos")
 
 test_main :: IO ExitCode
 test_main = let
