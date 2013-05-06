@@ -52,22 +52,15 @@ subtreeMerge base name = do
   commit $ "Subtree merged in " ++ name
   where repo = base ++ "/" ++ name ++ ".git"
 
-initRepo :: String -> IO ExitCode
-initRepo dir = do
-  createDirectoryIfMissing False dir
-  cd dir
-  init
-  setupRepo
-
 setupRepo :: IO ExitCode
 setupRepo = do
-  rawSystem "touch" [".gitignore"]
-  git "add" [".gitignore"]
-  commit "initial commit"
+  --rawSystem "touch" [".gitignore"]
+  --git "add" [".gitignore"]
+  --commit "initial commit"
+  branch "upstream-subtrees"
 
 addSubtrees :: String -> [String] -> IO [ExitCode]
 addSubtrees base repos = do
-  branch "upstream-subtrees"
   checkout "upstream-subtrees"
   mapM (subtreeMerge base) repos
 
@@ -83,7 +76,8 @@ pullSubtrees repos = do
   mapM pullSubtree repos
 
 data Command
-  = PullSubtrees [String]
+  = SetupForSubtrees
+  | PullSubtrees [String]
   | AddSubtrees String [String]
   deriving Show
 
@@ -96,10 +90,12 @@ options = Options <$> commands
 
 commands :: Parser Command
 commands = subparser
-  ( command "pull" (info pullOptions
-    (progDesc "Pull all subtrees from origins"))
+  ( command "setup" (info (pure SetupForSubtrees)
+    (progDesc "Set up repo for subtree merges"))
  <> command "add" (info addOptions
     (progDesc "Add subtrees to remotes and merge them as subdirectories"))
+ <> command "pull" (info pullOptions
+    (progDesc "Pull all subtrees from origins"))
   )
 
 pullOptions :: Parser Command
@@ -115,12 +111,16 @@ run :: Options -> IO ExitCode
 run (Options (PullSubtrees [])) = putStrLn "pull all subtrees not yet implemented" >> (return $ ExitFailure 11)
 run (Options (PullSubtrees repos)) = runPullSubtrees repos
 run (Options (AddSubtrees base repos)) = runAddSubtrees base repos
+run (Options SetupForSubtrees) = runSetup
 
 runPullSubtrees :: [String] -> IO ExitCode
 runPullSubtrees repos = pullSubtrees repos >>= return . maximum
 
 runAddSubtrees :: String -> [String] -> IO ExitCode
 runAddSubtrees base repos = addSubtrees base repos >>= return . maximum
+
+runSetup :: IO ExitCode
+runSetup = setupRepo
 
 main :: IO ()
 main = execParser opts >>= run
@@ -138,7 +138,10 @@ test_main = let
   in do
     tmp <- getTemporaryDirectory
     let dir = "/src/subtree-merges" ++ "/test"
-    initRepo dir
+    createDirectoryIfMissing False dir
+    cd dir
+    init
+    setupRepo
     addSubtrees base repos
     >>= exitWith . maximum
   --in do
