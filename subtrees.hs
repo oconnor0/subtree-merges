@@ -106,19 +106,21 @@ commands = subparser
  <> command "add" (info addOptions
     (progDesc "Add subtrees to remotes and merge them as subdirectories"))
  <> command "pull" (info pullOptions
-    (progDesc "Pull all subtrees from origins"))
+    (progDesc "Pull subtrees from origins"))
   )
 
 initOptions :: Parser Command
 initOptions = InitRepository
-  <$> argument str (
-      metavar "DIR"
+  <$> argument str
+    ( metavar "DIR"
    <> value "."
    <> help "Directory to create repository in; defaults to current directory")
 
 pullOptions :: Parser Command
 pullOptions =  PullSubtrees
-  <$> arguments str (metavar "SUBTREE...")
+  <$> arguments str
+    ( metavar "SUBTREE..."
+   <> help "List of subtrees to pull into this repo")
 
 addOptions :: Parser Command
 addOptions = AddSubtrees
