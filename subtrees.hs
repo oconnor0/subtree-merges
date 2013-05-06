@@ -54,6 +54,7 @@ subtreeMerge base name = do
 
 setupRepo :: IO ExitCode
 setupRepo = do
+  -- TODO: this should actually properly setup the repo
   --rawSystem "touch" [".gitignore"]
   --git "add" [".gitignore"]
   --commit "initial commit"
