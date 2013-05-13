@@ -10,6 +10,8 @@ import System.Cmd (rawSystem)
 import System.Directory
 import System.Exit
 
+-- the commands here are from https://help.github.com/articles/working-with-subtree-merge
+
 maybeThrow :: ExitCode -> IO ExitCode
 maybeThrow e@(ExitFailure _) = throwIO e
 maybeThrow ExitSuccess = return ExitSuccess
@@ -76,7 +78,9 @@ pull args = git "pull" args
 
 pullSubtree :: String -> IO ExitCode
 pullSubtree repo = do
-  pull ["-s", "subtree", repo, "master"]
+  --pull ["-s", "subtree", repo, "master"]
+  -- git pull -s recursive -X subtree=src/ external testBranchB
+  pull ["-s", "recursive", "-X", "subtree=" ++ repo ++ "/", repo, "master"]
 
 pullSubtrees :: [String] -> IO [ExitCode]
 pullSubtrees repos = do
