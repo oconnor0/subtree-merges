@@ -11,6 +11,8 @@ import System.Directory
 import System.Exit
 
 -- the commands here are from https://help.github.com/articles/working-with-subtree-merge
+-- somewhat merged to actually use git-subtree
+-- which is documented at https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt
 
 maybeThrow :: ExitCode -> IO ExitCode
 maybeThrow e@(ExitFailure _) = throwIO e
