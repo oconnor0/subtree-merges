@@ -71,6 +71,7 @@ setupRepo = do
 
 subtreeAdd :: String -> String -> String -> IO ExitCode
 subtreeAdd prefix repository refspec = do
+  git "remote" ["add", prefix, repository]
   git "subtree" ["add", "-P", prefix, repository, refspec]
 
 addSubtrees :: String -> [String] -> IO [ExitCode]
