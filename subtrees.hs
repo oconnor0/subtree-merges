@@ -69,9 +69,13 @@ setupRepo :: IO ExitCode
 setupRepo = do
   branch "upstream-subtrees"
 
+subtreeAdd :: String -> String -> String -> IO ExitCode
+subtreeAdd prefix repository refspec = do
+  git "subtree" ["add", "-P", prefix, repository, refspec]
+
 addSubtrees :: String -> [String] -> IO [ExitCode]
 addSubtrees base repos = do
-  mapM (subtreeMerge base) repos
+  mapM (\repo -> subtreeAdd repo (base ++ "/" ++ repo ++ ".git") "master") repos
 
 pull :: [String] -> IO ExitCode
 pull args = git "pull" args
@@ -80,7 +84,8 @@ pullSubtree :: String -> IO ExitCode
 pullSubtree repo = do
   --pull ["-s", "subtree", repo, "master"]
   -- git pull -s recursive -X subtree=src/ external testBranchB
-  pull ["-s", "recursive", "-X", "subtree=" ++ repo ++ "/", repo, "master"]
+  --pull ["-s", "recursive", "-X", "subtree=" ++ repo ++ "/", repo, "master"]
+  git "subtree" ["pull", "-P", repo, repo, "master"]
 
 pullSubtrees :: [String] -> IO [ExitCode]
 pullSubtrees repos = do
